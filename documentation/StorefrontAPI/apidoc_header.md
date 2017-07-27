@@ -1,0 +1,2 @@
+You may test out APIs and webhooks <a href="http://sandbox-api.hubwire.com/1.0/api-explorer">here</a>.<br/>
+Changelog last updated on 2016-12-01, <a href="http://sandbox-api.hubwire.com/1.0/changelog/storefront">click here</a>.

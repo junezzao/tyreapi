@@ -1,0 +1,8 @@
+{
+	"name": "Channels",
+	"slug": "channels",
+	"namespace": "Channels",
+	"version": "1.0",
+	"description": "Hubwire channel management module",
+	"enabled": true
+}

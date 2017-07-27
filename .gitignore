@@ -1,0 +1,16 @@
+/vendor
+/node_modules
+Homestead.yaml
+Homestead.json
+.env
+
+.DS_Store
+*/.DS_Dtore
+composer.lock
+storage/*
+!storage/app/modules.json
+!storage/app/merchant_list_updated.csv
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml

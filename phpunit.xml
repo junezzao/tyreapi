@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit backupGlobals="false"
+         backupStaticAttributes="false"
+         bootstrap="bootstrap/autoload.php"
+         colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         processIsolation="false"
+         stopOnFailure="false">
+    <testsuites>
+        <testsuite name="Application Test Suite">
+            <directory>./tests/</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist>
+            <directory suffix=".php">app/</directory>
+        </whitelist>
+    </filter>
+    <php>
+        <env name="APP_ENV" value="testing"/>
+        <env name="DB_CONNECTION" value="testing"/>
+        <env name="DB_DATABASE" value="hubwire_testing"/>
+        <env name="CACHE_DRIVER" value="redis"/>
+	    <env name="CACHE_TIME" value="10" />
+        <env name="SESSION_DRIVER" value="array"/>
+        <env name="QUEUE_DRIVER" value="database"/>
+        <env name="BASE_URI" value="http://hapi.local.com/1.0"/>
+        <env name="DB_CONNECTION2" value="front"/>
+        <env name="DB_HOST2" value="localhost"/>
+        <env name="DB_DATABASE2" value="hubwire_front_testing"/>
+        <env name="DB_USERNAME2" value="root"/>
+        <env name="DB_PASSWORD2" value="abcd1234"/>
+    </php>
+</phpunit>

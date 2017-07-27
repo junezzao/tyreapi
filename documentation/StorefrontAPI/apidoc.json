@@ -1,0 +1,11 @@
+{
+  "name": "Hubwire API",
+  "version": "1.0.0",
+  "description": "Storefront API for Hubwire 3.0",
+  "title": "Hubwire - API",
+  "url" : "http://sandbox-api.hubwire.com/1.0",
+  "header" : {
+  	"title": "General",
+  	"filename" : "apidoc_header.md"
+  }
+}
