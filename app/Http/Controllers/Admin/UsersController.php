@@ -120,7 +120,7 @@ class UsersController extends AdminController
      */
     public function show($id)
     {
-        $user = User::with('merchant')->with('channels')->withTrashed()->find($id);
+        $user = User::withTrashed()->find($id);
         $role = $user->getRoles();
         if (count($role) > 0) {
             $user->category = $role[0]->slug;
@@ -195,7 +195,8 @@ class UsersController extends AdminController
             $user->detachAllRoles();
             $user->attachRole($user_category->id);
 
-            $merchant = $this->merchantRepo->findBy('slug', $input['merchant'], ['id', 'name', 'timezone', 'currency']);
+            //$merchant = $this->merchantRepo->findBy('slug', $input['merchant'], ['id', 'name', 'timezone', 'currency']);
+            $merchant = array();
             $input['merchant_id'] = (!empty($merchant) && ($input['category'] == 'clientadmin' || $input['category'] == 'clientuser')) ? $merchant->id : null;
 
             $input['category'] = $user_category->name;

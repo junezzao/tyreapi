@@ -64,10 +64,10 @@ class UserRepository extends Repository implements UserRepositoryInterface
                 $user->channels()->detach($deleted_channels);
             }
         } else {
-            $user->channels()->detach();
+            // $user->channels()->detach();
         }
 
-        return $this->model->with('channels')->find($id);
+        return $this->model->find($id);
     }
 
     public function all($filters=array())
@@ -86,9 +86,9 @@ class UserRepository extends Repository implements UserRepositoryInterface
         } 
         else 
         {
-            $users = User::with('merchant');
-            if (!empty($merchant_id)) $users = $users->where('merchant_id', $merchant_id);
-            if (!empty($filters['with_trashed']) && $filters['with_trashed'] == true) $users = $users->withTrashed();
+            //$users = User::with('merchant');
+            if (!empty($merchant_id)) $users = User::where('merchant_id', $merchant_id);
+            if (!empty($filters['with_trashed']) && $filters['with_trashed'] == true) $users = User::withTrashed();
             $users = $users->get();
         }  
         return $users;

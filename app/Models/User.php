@@ -54,11 +54,6 @@ class User extends BaseModel implements AuthenticatableContract, CanResetPasswor
      * Relationships
      *
      */
-    public function merchant()
-    {
-        return $this->belongsTo('App\Models\Admin\Merchant')->withTrashed();
-    }
-
     public function scopeIsActive($query)
     {
         return $query->where('status','Active');
@@ -76,10 +71,6 @@ class User extends BaseModel implements AuthenticatableContract, CanResetPasswor
         return $this->save();
     }
 
-    public function channels()
-    {
-        return $this->belongsToMany('App\Models\Admin\Channel')->withTimestamps()->withTrashed();
-    }
     /**
      * The "booting" method of the model.
      *
