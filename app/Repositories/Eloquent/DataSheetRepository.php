@@ -129,7 +129,7 @@ class DataSheetRepository extends Repository implements DataSheetRepositoryInter
                         ');
             foreach($jobsheets as $jobsheet) {
                 if(!empty($jobsheet->pm_no)) {
-                    $return[$jobsheet->customer_name]['PM'][$jobsheet->pm_no][Helper::formatEmpty($jobsheet->position)][] = array(
+                    $return[Helper::formatEmpty($jobsheet->customer_name)]['PM'][$jobsheet->pm_no][Helper::formatEmpty($jobsheet->position)][] = array(
                         'date'      => Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date)),
                         'in'        => $this->getTyreInfo($jobsheet, 'in', false, true, true, true),
                         'invoice'   => 'RM'.number_format($jobsheet->in_price, 2).' @'.Helper::formatEmpty($jobsheet->jobsheet_no).' / '.Helper::formatEmpty($jobsheet->inv_no),
@@ -137,7 +137,7 @@ class DataSheetRepository extends Repository implements DataSheetRepositoryInter
                     );
                 }
                 if(!empty($jobsheet->trailer_no)) {
-                    $return[$jobsheet->customer_name]['Trailer'][$jobsheet->trailer_no][Helper::formatEmpty($jobsheet->position)][] = array(
+                    $return[Helper::formatEmpty($jobsheet->customer_name)]['Trailer'][$jobsheet->trailer_no][Helper::formatEmpty($jobsheet->position)][] = array(
                         'date'      => Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date)),
                         'in'        => $this->getTyreInfo($jobsheet, 'in', false, true, true, true),
                         'invoice'   => 'RM'.number_format($jobsheet->in_price, 2).' @'.Helper::formatEmpty($jobsheet->jobsheet_no).' / '.Helper::formatEmpty($jobsheet->inv_no),
@@ -145,7 +145,7 @@ class DataSheetRepository extends Repository implements DataSheetRepositoryInter
                     );
                 }
                 if(!empty($jobsheet->truck_no)) {
-                    $return[$jobsheet->customer_name]['Truck'][$jobsheet->truck_no][Helper::formatEmpty($jobsheet->position)][] = array(
+                    $return[Helper::formatEmpty($jobsheet->customer_name)]['Truck'][$jobsheet->truck_no][Helper::formatEmpty($jobsheet->position)][] = array(
                         'date'      => Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date)),
                         'in'        => $this->getTyreInfo($jobsheet, 'in', false, true, true, true),
                         'invoice'   => 'RM'.number_format($jobsheet->in_price, 2).' @'.Helper::formatEmpty($jobsheet->jobsheet_no).' / '.Helper::formatEmpty($jobsheet->inv_no),
@@ -153,7 +153,7 @@ class DataSheetRepository extends Repository implements DataSheetRepositoryInter
                     );
                 }
                 if(empty($jobsheet->pm_no) && empty($jobsheet->trailer_no) && empty($jobsheet->truck_no)) {
-                    $return[$jobsheet->customer_name]['(empty)']['(empty)'][Helper::formatEmpty($jobsheet->position)][] = array(
+                    $return[Helper::formatEmpty($jobsheet->customer_name)]['(empty)']['(empty)'][Helper::formatEmpty($jobsheet->position)][] = array(
                         'date'      => Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date)),
                         'in'        => $this->getTyreInfo($jobsheet, 'in', false, true, true, true),
                         'invoice'   => 'RM'.number_format($jobsheet->in_price, 2).' @'.Helper::formatEmpty($jobsheet->jobsheet_no).' / '.Helper::formatEmpty($jobsheet->inv_no),
@@ -178,20 +178,20 @@ class DataSheetRepository extends Repository implements DataSheetRepositoryInter
                             order by jobsheet_date asc
                         ');
             foreach($jobsheets as $jobsheet) {
-                $jobsheetNo = Helper::formatEmpty($jobsheet->jobsheet_no);
-                $invoiceNo  = Helper::formatEmpty($jobsheet->inv_no);
-                $invoiceAmt = 'RM'.number_format($jobsheet->inv_amt, 2);
-                //$totalPrice = 'RM'.number_format($jobsheet->total_price, 2);
+                $customerName   = Helper::formatEmpty($jobsheet->customer_name);
+                $jobsheetNo     = Helper::formatEmpty($jobsheet->jobsheet_no);
+                $invoiceNo      = Helper::formatEmpty($jobsheet->inv_no);
+                $invoiceAmt     = 'RM'.number_format($jobsheet->inv_amt, 2);
 
                 if(!empty($jobsheet->pm_no)) {
-                    if(!isset($return[$jobsheet->customer_name]['PM'][$jobsheet->pm_no][Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date))][$jobsheetNo.': TOTAL_PRICE / '.$invoiceNo.', '.$invoiceAmt])) {
-                        $return[$jobsheet->customer_name]['PM'][$jobsheet->pm_no][Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date))][$jobsheetNo.': TOTAL_PRICE / '.$invoiceNo.', '.$invoiceAmt]['totalPrice'] = $jobsheet->in_price;
+                    if(!isset($return[$customerName]['PM'][$jobsheet->pm_no][Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date))][$jobsheetNo.': TOTAL_PRICE / '.$invoiceNo.', '.$invoiceAmt])) {
+                        $return[$customerName]['PM'][$jobsheet->pm_no][Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date))][$jobsheetNo.': TOTAL_PRICE / '.$invoiceNo.', '.$invoiceAmt]['totalPrice'] = $jobsheet->in_price;
                     } else {
-                        $return[$jobsheet->customer_name]['PM'][$jobsheet->pm_no][Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date))][$jobsheetNo.': TOTAL_PRICE / '.$invoiceNo.', '.$invoiceAmt]['totalPrice'] += $jobsheet->in_price;
+                        $return[$customerName]['PM'][$jobsheet->pm_no][Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date))][$jobsheetNo.': TOTAL_PRICE / '.$invoiceNo.', '.$invoiceAmt]['totalPrice'] += $jobsheet->in_price;
                     }
 
 
-                   $return[$jobsheet->customer_name]['PM'][$jobsheet->pm_no][Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date))][$jobsheetNo.': TOTAL_PRICE / '.$invoiceNo.', '.$invoiceAmt]['positions'][] = array(
+                   $return[$customerName]['PM'][$jobsheet->pm_no][Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date))][$jobsheetNo.': TOTAL_PRICE / '.$invoiceNo.', '.$invoiceAmt]['positions'][] = array(
                         'position'  => Helper::formatEmpty($jobsheet->position),
                         'in'        => $this->getTyreInfo($jobsheet, 'in', false, true, true, true),
                         'invoice'   => 'RM'.number_format($jobsheet->in_price, 2),
@@ -200,14 +200,14 @@ class DataSheetRepository extends Repository implements DataSheetRepositoryInter
                 }
 
                 if(!empty($jobsheet->trailer_no)) {
-                    if(!isset($return[$jobsheet->customer_name]['Trailer'][$jobsheet->trailer_no][Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date))][$jobsheetNo.': TOTAL_PRICE / '.$invoiceNo.', '.$invoiceAmt])) {
-                        $return[$jobsheet->customer_name]['Trailer'][$jobsheet->trailer_no][Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date))][$jobsheetNo.': TOTAL_PRICE / '.$invoiceNo.', '.$invoiceAmt]['totalPrice'] = $jobsheet->in_price;
+                    if(!isset($return[$customerName]['Trailer'][$jobsheet->trailer_no][Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date))][$jobsheetNo.': TOTAL_PRICE / '.$invoiceNo.', '.$invoiceAmt])) {
+                        $return[$customerName]['Trailer'][$jobsheet->trailer_no][Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date))][$jobsheetNo.': TOTAL_PRICE / '.$invoiceNo.', '.$invoiceAmt]['totalPrice'] = $jobsheet->in_price;
                     } else {
-                        $return[$jobsheet->customer_name]['Trailer'][$jobsheet->trailer_no][Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date))][$jobsheetNo.': TOTAL_PRICE / '.$invoiceNo.', '.$invoiceAmt]['totalPrice'] += $jobsheet->in_price;
+                        $return[$customerName]['Trailer'][$jobsheet->trailer_no][Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date))][$jobsheetNo.': TOTAL_PRICE / '.$invoiceNo.', '.$invoiceAmt]['totalPrice'] += $jobsheet->in_price;
                     }
 
 
-                   $return[$jobsheet->customer_name]['Trailer'][$jobsheet->trailer_no][Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date))][$jobsheetNo.': TOTAL_PRICE / '.$invoiceNo.', '.$invoiceAmt]['positions'][] = array(
+                   $return[$customerName]['Trailer'][$jobsheet->trailer_no][Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date))][$jobsheetNo.': TOTAL_PRICE / '.$invoiceNo.', '.$invoiceAmt]['positions'][] = array(
                         'position'  => Helper::formatEmpty($jobsheet->position),
                         'in'        => $this->getTyreInfo($jobsheet, 'in', false, true, true, true),
                         'invoice'   => 'RM'.number_format($jobsheet->in_price, 2),
@@ -216,14 +216,14 @@ class DataSheetRepository extends Repository implements DataSheetRepositoryInter
                 }
 
                 if(!empty($jobsheet->truck_no)) {
-                    if(!isset($return[$jobsheet->customer_name]['Truck'][$jobsheet->truck_no][Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date))][$jobsheetNo.': TOTAL_PRICE / '.$invoiceNo.', '.$invoiceAmt])) {
-                        $return[$jobsheet->customer_name]['Truck'][$jobsheet->truck_no][Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date))][$jobsheetNo.': TOTAL_PRICE / '.$invoiceNo.', '.$invoiceAmt]['totalPrice'] = $jobsheet->in_price;
+                    if(!isset($return[$customerName]['Truck'][$jobsheet->truck_no][Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date))][$jobsheetNo.': TOTAL_PRICE / '.$invoiceNo.', '.$invoiceAmt])) {
+                        $return[$customerName]['Truck'][$jobsheet->truck_no][Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date))][$jobsheetNo.': TOTAL_PRICE / '.$invoiceNo.', '.$invoiceAmt]['totalPrice'] = $jobsheet->in_price;
                     } else {
-                        $return[$jobsheet->customer_name]['Truck'][$jobsheet->truck_no][Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date))][$jobsheetNo.': TOTAL_PRICE / '.$invoiceNo.', '.$invoiceAmt]['totalPrice'] += $jobsheet->in_price;
+                        $return[$customerName]['Truck'][$jobsheet->truck_no][Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date))][$jobsheetNo.': TOTAL_PRICE / '.$invoiceNo.', '.$invoiceAmt]['totalPrice'] += $jobsheet->in_price;
                     }
 
 
-                   $return[$jobsheet->customer_name]['Truck'][$jobsheet->truck_no][Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date))][$jobsheetNo.': TOTAL_PRICE / '.$invoiceNo.', '.$invoiceAmt]['positions'][] = array(
+                   $return[$customerName]['Truck'][$jobsheet->truck_no][Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date))][$jobsheetNo.': TOTAL_PRICE / '.$invoiceNo.', '.$invoiceAmt]['positions'][] = array(
                         'position'  => Helper::formatEmpty($jobsheet->position),
                         'in'        => $this->getTyreInfo($jobsheet, 'in', false, true, true, true),
                         'invoice'   => 'RM'.number_format($jobsheet->in_price, 2),
@@ -232,14 +232,14 @@ class DataSheetRepository extends Repository implements DataSheetRepositoryInter
                 }
 
                 if(empty($jobsheet->pm_no) && empty($jobsheet->trailer_no) && empty($jobsheet->truck_no)) {
-                    if(!isset($return[$jobsheet->customer_name]['(empty)']['(empty)'][Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date))][$jobsheetNo.': TOTAL_PRICE / '.$invoiceNo.', '.$invoiceAmt])) {
-                        $return[$jobsheet->customer_name]['(empty)']['(empty)'][Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date))][$jobsheetNo.': TOTAL_PRICE / '.$invoiceNo.', '.$invoiceAmt]['totalPrice'] = $jobsheet->in_price;
+                    if(!isset($return[$customerName]['(empty)']['(empty)'][Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date))][$jobsheetNo.': TOTAL_PRICE / '.$invoiceNo.', '.$invoiceAmt])) {
+                        $return[$customerName]['(empty)']['(empty)'][Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date))][$jobsheetNo.': TOTAL_PRICE / '.$invoiceNo.', '.$invoiceAmt]['totalPrice'] = $jobsheet->in_price;
                     } else {
-                        $return[$jobsheet->customer_name]['(empty)']['(empty)'][Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date))][$jobsheetNo.': TOTAL_PRICE / '.$invoiceNo.', '.$invoiceAmt]['totalPrice'] += $jobsheet->in_price;
+                        $return[$customerName]['(empty)']['(empty)'][Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date))][$jobsheetNo.': TOTAL_PRICE / '.$invoiceNo.', '.$invoiceAmt]['totalPrice'] += $jobsheet->in_price;
                     }
 
 
-                   $return[$jobsheet->customer_name]['(empty)']['(empty)'][Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date))][$jobsheetNo.': TOTAL_PRICE / '.$invoiceNo.', '.$invoiceAmt]['positions'][] = array(
+                   $return[$customerName]['(empty)']['(empty)'][Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date))][$jobsheetNo.': TOTAL_PRICE / '.$invoiceNo.', '.$invoiceAmt]['positions'][] = array(
                         'position'  => Helper::formatEmpty($jobsheet->position),
                         'in'        => $this->getTyreInfo($jobsheet, 'in', false, true, true, true),
                         'invoice'   => 'RM'.number_format($jobsheet->in_price, 2),
@@ -270,7 +270,7 @@ class DataSheetRepository extends Repository implements DataSheetRepositoryInter
             $return['USED'] = $this->getTyreBrandNewData($sheet->id, 'USED');
         }
 
-        \Log::info('return... '.print_r($return, true));
+        //\Log::info('return... '.print_r($return, true));
         return $return;
     }
 
@@ -943,7 +943,7 @@ class DataSheetRepository extends Repository implements DataSheetRepositoryInter
             // part 3 end
         }
 
-        \Log::info('return... '.print_r($return, true));
+        // \Log::info('return... '.print_r($return, true));
         //die();
         return $return;
     }
@@ -992,8 +992,7 @@ class DataSheetRepository extends Repository implements DataSheetRepositoryInter
             // part 1 end
         }
 
-        \Log::info('return... '.print_r($return, true));
-        //die();
+        // \Log::info('return... '.print_r($return, true));
         return $return;
     }
 }
