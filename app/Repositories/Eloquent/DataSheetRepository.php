@@ -644,21 +644,23 @@ class DataSheetRepository extends Repository implements DataSheetRepositoryInter
                 $vehicle = $this->getVehicleInfo($jobsheet);
 
                 if(!empty($vehicle)) {
-                    if(!empty($jobsheet->in_serial_no)) {
+                    if(!empty($jobsheet->out_serial_no) && isset($vehicles[$vehicle])) {
                         $tyre = $this->getTyreInfo($jobsheet, 'out', true);
+
+                        $vehicles[$vehicle][$jobsheet->position][] = array(
+                            'type'      => 'out',
+                            'serialNo'  => $jobsheet->out_serial_no,
+                            'info'      => 'Date '.Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date)).' @'.Helper::formatEmpty($jobsheet->jobsheet_no).' Pos '.Helper::formatEmpty($jobsheet->position).', Remove: '.Helper::formatEmpty($tyre).', '.Helper::formatEmpty($jobsheet->out_serial_no)
+                        );
+                    }
+
+                    if(!empty($jobsheet->in_serial_no)) {
+                        $tyre = $this->getTyreInfo($jobsheet, 'in', true);
 
                         $vehicles[$vehicle][$jobsheet->position][] = array(
                             'type'      => 'in',
                             'serialNo'  => $jobsheet->in_serial_no,
                             'info'      => 'Date '.Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date)).' @'.Helper::formatEmpty($jobsheet->jobsheet_no).' Pos '.Helper::formatEmpty($jobsheet->position).', Fitting: '.Helper::formatEmpty($tyre).', '.Helper::formatEmpty($jobsheet->in_serial_no)
-                        );
-                    }
-
-                    if(!empty($jobsheet->out_serial_no) && isset($vehicles[$vehicle])) {
-                        $vehicles[$vehicle][$jobsheet->position][] = array(
-                            'type'      => 'out',
-                            'serialNo'  => $jobsheet->out_serial_no,
-                            'info'      => 'Date '.Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date)).' @'.Helper::formatEmpty($jobsheet->jobsheet_no).' Pos '.Helper::formatEmpty($jobsheet->position).', Remove: '.Helper::formatEmpty($tyre).', '.Helper::formatEmpty($jobsheet->out_serial_no)
                         );
                     }
                 }
