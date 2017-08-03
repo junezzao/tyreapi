@@ -74,10 +74,10 @@ class OAuthController extends Controller
     {
         $user = $this->user->where('email', \Input::get('email') )->first();
         if (is_null($user)) {
-            $response['success'] = false;
-            $response['error'] = trans('sentence.forgot_password_email_not_found', ['email'=>\Input::get('email')]);
+            //$response['success'] = false;
+            //$response['error'] = trans('sentence.forgot_password_email_not_found', ['email'=>\Input::get('email')]);
             
-            return response()->json($response);
+            return response()->json(['success'=>true, 'admin'=>array()]);
         }
 
         //$user->update(['status'=>'Unverified']);

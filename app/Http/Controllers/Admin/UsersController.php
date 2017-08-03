@@ -15,6 +15,7 @@ use Validator;
 use DB;
 use App\Services\Mailer;
 use Activity;
+use Hash;
 
 class UsersController extends AdminController
 {
@@ -192,8 +193,16 @@ class UsersController extends AdminController
         $user = $this->userRepo->update($input, $id);
         
         if (isset($input['new_password']) && !empty($input['new_password'])) {
-            $user->password = bcrypt($input['new_password']);
-            $user->save();
+            //\Log::info('db password... '.$user->password);
+            //\Log::info('input password... '.bcrypt($input['old_password']));
+            if(Hash::check($input['old_password'], $user->password)) {
+                $user->password = bcrypt($input['new_password']);
+                $user->save();
+            } else {
+                $response['success'] = false;
+                $response['errors']['old_password'][] = 'The old password does not match.';
+                return response()->json($response);
+            }
         }
 
         Activity::log('User profile ('. $user->id .') updated successfully.', $this->authorizer->getResourceOwnerId());
