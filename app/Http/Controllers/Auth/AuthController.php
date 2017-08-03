@@ -220,13 +220,13 @@ class AuthController extends Controller
             'address_country'   => 'required|max:2'
         ));
 
-        $role = Role::select('id', 'name')->where('slug', 'user')->firstOrFail();
+        $role = Role::select('id', 'name')->where('slug', 'lite')->firstOrFail();
         $token = $this->generateRandomString();
 
         $data               = $request->all();
         $data['password']   = bcrypt($token);
         $data['status']     = 'Unverified';
-        $data['category']   = 'User';
+        $data['category']   = $role->name;
 
         $userRepo = new UserRepository(new User, new Role);
         $user = $userRepo->create($data);

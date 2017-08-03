@@ -169,6 +169,7 @@ Route::group(['prefix' => '1.0'], function(){
 			Route::get('getLoggedInUserPermission', 'Admin\UsersController@getLoggedInUserPermission');
             //Route::get('user/{id}', 'Admin\UsersController@getUser');
             Route::post('users/create', 'Admin\UsersController@store');
+            Route::post('users/subscribe/{userId}', 'Admin\UsersController@subscribe');
             Route::get('suppliers/{merchantId}/byMerchant', 'Admin\SuppliersController@byMerchant');
             Route::get('suppliers/{id}/with-trashed', 'Admin\SuppliersController@showWithTrashed');
             Route::get('merchants/with-trashed', 'Admin\MerchantsController@indexWithTrashed');

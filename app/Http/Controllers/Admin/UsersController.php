@@ -6,6 +6,7 @@ use LucaDegasperi\OAuth2Server\Authorizer;
 use Illuminate\Http\Response;
 use App\Models\User;
 use App\Models\Admin\Merchant;
+use App\Models\Subscription;
 use Bican\Roles\Models\Role;
 use App\Repositories\Contracts\UserRepository;
 use App\Repositories\Contracts\MerchantRepository;
@@ -120,13 +121,13 @@ class UsersController extends AdminController
      */
     public function show($id)
     {
-        $user = User::withTrashed()->find($id);
+        $user = User::withTrashed()->with('subscriptions')->with('activePlan')->find($id);
         $role = $user->getRoles();
         if (count($role) > 0) {
-            $user->category = $role[0]->slug;
+            // $user->category = $role[0]->slug;
             $user->level = $role[0]->level;
         } else {
-            $user->category = '';
+            // $user->category = '';
         }
         
         return response()->json($user);
@@ -186,22 +187,8 @@ class UsersController extends AdminController
      */
     public function update($id)
     {
-        $input = \Input::except('email');
-        $user = $this->userRepo->find($id);
+        $input = \Input::except('email', 'category');
         
-        // if user edited by superadmin
-        if (isset($input['editUser'])) {
-            $user_category = Role::select('id', 'name')->where('slug', '=', $input['category'])->firstOrFail();
-            $user->detachAllRoles();
-            $user->attachRole($user_category->id);
-
-            //$merchant = $this->merchantRepo->findBy('slug', $input['merchant'], ['id', 'name', 'timezone', 'currency']);
-            $merchant = array();
-            $input['merchant_id'] = (!empty($merchant) && ($input['category'] == 'clientadmin' || $input['category'] == 'clientuser')) ? $merchant->id : null;
-
-            $input['category'] = $user_category->name;
-        }
-
         $user = $this->userRepo->update($input, $id);
         
         if (isset($input['new_password']) && !empty($input['new_password'])) {
@@ -229,6 +216,36 @@ class UsersController extends AdminController
         $user->save();
         $user->delete();
         Activity::log('User (' . $user->email . ') has been deleted.', $this->authorizer->getResourceOwnerId());
+        $response['success'] = true;
+        return response()->json($response);
+    }
+
+    public function subscribe(Request $request, $id)
+    {
+        $user = User::with('subscriptions')->find($id);
+        $today = date('Y-m-d');
+        $lastEndDate = $today;
+        if(count($user->subscriptions) > 0) {
+            $lastEndDate = $user->subscriptions[0]->end_date;
+        }
+
+        $newStartDate = strtotime($today) >= strtotime($lastEndDate) ? $today : date("Y-m-d", strtotime("+1 day", strtotime($lastEndDate)));
+
+        $subscription = new Subscription;
+        $subscription->user_id = $id;
+        $subscription->role_id = $request->input('subscription_type');
+        $subscription->status = strtotime($today) >= strtotime($newStartDate) ? 'Active' : 'Upcoming';
+        $subscription->start_date = $newStartDate;
+        $subscription->end_date = date("Y-m-d", strtotime("-1 day", strtotime("+1 month", strtotime($newStartDate))));
+        $subscription->save();
+
+        $role = Role::findOrFail($subscription->role_id);
+        if($subscription->status == 'Active') {
+            $user->category = $role->name;
+            $user->subscription_id = $subscription->id;
+            $user->save();
+        }
+
         $response['success'] = true;
         return response()->json($response);
     }

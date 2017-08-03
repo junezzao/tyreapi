@@ -71,6 +71,16 @@ class User extends BaseModel implements AuthenticatableContract, CanResetPasswor
         return $this->save();
     }
 
+    public function subscriptions()
+    {
+        return $this->hasMany('App\Models\Subscription')->with('role')->orderBy('start_date', 'desc');
+    }
+
+    public function activePlan()
+    {
+        return $this->hasOne('App\Models\Subscription')->where('status', 'Active');
+    }
+
     /**
      * The "booting" method of the model.
      *
