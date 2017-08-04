@@ -164,7 +164,7 @@ class DataSheetRepository extends Repository implements DataSheetRepositoryInter
         }
 
         // \Log::info('return... '.print_r($return, true));
-        return $return;
+        return array_sort_recursive($return);
     }
 
     public function viewTruckService($userId) {
@@ -250,7 +250,7 @@ class DataSheetRepository extends Repository implements DataSheetRepositoryInter
         }
 
         // \Log::info('return... '.print_r($return, true));
-        return $return;
+        return array_sort_recursive($return);
     }
 
     public function viewTyreBrand($userId) {
@@ -306,7 +306,7 @@ class DataSheetRepository extends Repository implements DataSheetRepositoryInter
         }
 
         // \Log::info('return... '.print_r($return, true));
-        return $return;
+        return array_sort_recursive($return);
     }
 
     public function getTyreBrandRetreadData($sheetId, $tyreAttribute) {
@@ -344,7 +344,7 @@ class DataSheetRepository extends Repository implements DataSheetRepositoryInter
         }
 
         // \Log::info('return... '.print_r($return, true));
-        return $return;
+        return array_sort_recursive($return);
     }
 
     public function serialNoAnalysis($userId) {
@@ -760,7 +760,7 @@ class DataSheetRepository extends Repository implements DataSheetRepositoryInter
                             if(
                                 $return[$jobsheet->out_serial_no][$fittingTimes-2]['vehicle'] == $return[$jobsheet->out_serial_no][$fittingTimes-1]['vehicle'] &&
                                 $return[$jobsheet->out_serial_no][$fittingTimes-2]['position'] == $return[$jobsheet->out_serial_no][$fittingTimes-1]['position'] &&
-                                $return[$jobsheet->out_serial_no][$fittingTimes-1]['in_out'] == 'Tyre In'
+                                $return[$jobsheet->out_serial_no][$fittingTimes-2]['in_out'] == 'Tyre In'
                             ) { 
                                 $lastOdometer   = $return[$jobsheet->out_serial_no][$fittingTimes-2]['odometer'];
                                 $odometer       = $return[$jobsheet->out_serial_no][$fittingTimes-1]['odometer'];
