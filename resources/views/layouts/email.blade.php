@@ -6,7 +6,6 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
     <style type="text/css" rel="stylesheet" media="all">
-        /* Media Queries */
         @media only screen and (max-width: 500px) {
             .button {
                 width: 100% !important;
@@ -20,12 +19,12 @@
 $style = [
     /* Layout ------------------------------ */
 
-    'body' => 'margin: 0; padding: 0; width: 100%; background-color: #F2F4F6;',
-    'email-wrapper' => 'width: 100%; margin: 0; padding: 0; background-color: #F2F4F6;',
+    'body' => 'margin: 0; padding: 0; width: 100%; background-color: #fff;',
+    'email-wrapper' => 'width: 100%; margin: 0; padding: 0; background-color: #fff;',
 
     /* Masthead ----------------------- */
 
-    'email-masthead' => 'padding: 25px 0; text-align: center;',
+    'email-masthead' => 'padding: 20px 0; text-align: center;',
     'email-masthead_name' => 'font-size: 16px; font-weight: bold; color: #2F3133; text-decoration: none; text-shadow: 0 1px 0 white;',
 
     'email-body' => 'width: 100%; margin: 0; padding: 0; border-top: 1px solid #EDEFF2; border-bottom: 1px solid #EDEFF2; background-color: #FFF;',
@@ -69,37 +68,29 @@ $style = [
         <tr>
             <td style="{{ $style['email-wrapper'] }}" align="center">
                 <table width="100%" cellpadding="0" cellspacing="0">
-                    <!-- Logo -->
                     <tr>
                         <td style="{{ $style['email-masthead'] }}">
-                            <a style="{{ $fontFamily }} {{ $style['email-masthead_name'] }}" href="{{ url('/') }}" target="_blank">
-                                {{ config('app.name') }}
-                            </a>
+                            <a href="{{ env('APP_URL_ADMIN') }}" target="_blank">{!! Html::image("images/pro-logo-rect.png", "Logo"),env('HTTPS',false) !!}</a>
                         </td>
                     </tr>
 
-                    <!-- Email Body -->
                     <tr>
                         <td style="{{ $style['email-body'] }}" width="100%">
                             <table style="{{ $style['email-body_inner'] }}" align="center" width="570" cellpadding="0" cellspacing="0">
                                 <tr>
                                     <td style="{{ $fontFamily }} {{ $style['email-body_cell'] }}">
-                                        <!-- Greeting -->
                                         <h1 style="{{ $style['header-1'] }}">
                                             @yield('heading')
                                         </h1>
 
-                                        <!-- Content -->
                                         <p style="{{ $style['paragraph'] }}">
                                             @yield('content')
                                         </p>
                                         
-                                        <!-- Salutation -->
                                         <p style="{{ $style['paragraph'] }}">
-                                            Regards,<br>{{ config('mail.from.name') }}
+                                            Best regards,<br>{{ config('mail.from.name') }}
                                         </p>
 
-                                        <!-- Sub Copy -->
                                         @if (isset($atts['actionText']))
                                             <table style="{{ $style['body_sub'] }}">
                                                 <tr>
@@ -118,23 +109,6 @@ $style = [
                                                 </tr>
                                             </table>
                                         @endif
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-
-                    <!-- Footer -->
-                    <tr>
-                        <td>
-                            <table style="{{ $style['email-footer'] }}" align="center" width="570" cellpadding="0" cellspacing="0">
-                                <tr>
-                                    <td style="{{ $fontFamily }} {{ $style['email-footer_cell'] }}">
-                                        <p style="{{ $style['paragraph-sub'] }}">
-                                            &copy; {{ date('Y') }}
-                                            <a style="{{ $style['anchor'] }}" href="{{ url('/') }}" target="_blank">{{ config('app.name') }}</a>.
-                                            All rights reserved.
-                                        </p>
                                     </td>
                                 </tr>
                             </table>

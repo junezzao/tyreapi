@@ -257,17 +257,23 @@ class DataSheetRepository extends Repository implements DataSheetRepositoryInter
         $sheet = $this->model->where('user_id', $userId)->first();
 
         $return = array(
-            'NT' => array(),
-            'STK' => array(),
-            'COC' => array(),
-            'USED' => array(),
+            'NT'            => array(),
+            'NT_SUB_CON'    => array(),
+            'STK'           => array(),
+            'STK_SUB_CON'   => array(),
+            'COC'           => array(),
+            'USED'          => array(),
+            'OTHER'         => array(),
         );
 
         if(!empty($sheet)) {
-            $return['NT']   = $this->getTyreBrandNewData($sheet->id, 'NT');
-            $return['STK']  = $this->getTyreBrandRetreadData($sheet->id, 'STK');
-            $return['COC']  = $this->getTyreBrandRetreadData($sheet->id, 'COC');
-            $return['USED'] = $this->getTyreBrandNewData($sheet->id, 'USED');
+            $return['NT']           = $this->getTyreBrandNewData($sheet->id, 'NT');
+            $return['NT_SUB_CON']   = $this->getTyreBrandNewData($sheet->id, 'NT_SUB_CON');
+            $return['STK']          = $this->getTyreBrandRetreadData($sheet->id, 'STK');
+            $return['STK_SUB_CON']  = $this->getTyreBrandRetreadData($sheet->id, 'STK_SUB_CON');
+            $return['COC']          = $this->getTyreBrandRetreadData($sheet->id, 'COC');
+            $return['USED']         = $this->getTyreBrandNewData($sheet->id, 'USED');
+            $return['OTHER']        = $this->getTyreBrandNewData($sheet->id, 'OTHER');
         }
 
         //\Log::info('return... '.print_r($return, true));

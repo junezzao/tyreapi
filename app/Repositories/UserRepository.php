@@ -69,28 +69,4 @@ class UserRepository extends Repository implements UserRepositoryInterface
 
         return $this->model->find($id);
     }
-
-    public function all($filters=array())
-    {
-        $channel_id = (isset($filters['channel_id']) && !empty($filters['channel_id'])) ? $filters['channel_id'] : '';
-        $merchant_id = (isset($filters['merchant_id']) && !empty($filters['merchant_id'])) ? $filters['merchant_id'] : '';
-
-        if(!empty($channel_id)) 
-        {
-            $u_arr = Channel::find($channel_id)->users;
-            $users = array();
-            foreach($u_arr as $u)
-            {
-                $users[] = (!empty($filters['with_trashed']) && $filters['with_trashed'] == true) ? User::with('merchant')->withTrashed()->find($u->id) : User::with('merchant')->find($u->id);
-            }
-        } 
-        else 
-        {
-            //$users = User::with('merchant');
-            if (!empty($merchant_id)) $users = User::where('merchant_id', $merchant_id);
-            if (!empty($filters['with_trashed']) && $filters['with_trashed'] == true) $users = User::withTrashed();
-            $users = $users->get();
-        }  
-        return $users;
-    }
 }
