@@ -1,8 +1,0 @@
-{
-	"name": "Fulfillment",
-	"slug": "fulfillment",
-	"namespace": "Fulfillment",
-	"version": "1.0",
-	"description": "Hubwire Fulfillment Module",
-	"enabled": true
-}

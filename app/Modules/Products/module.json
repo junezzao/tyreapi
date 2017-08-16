@@ -1,8 +1,0 @@
-{
-	"name": "Products",
-	"slug": "products",
-	"namespace": "Products",
-	"version": "1.0",
-	"description": "Product Module",
-	"enabled": true
-}

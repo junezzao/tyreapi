@@ -37,11 +37,6 @@ return [
                 'access_token_ttl' => 604800,
                 'callback' => '\App\Http\Controllers\Auth\OAuthController@passwordGrantVerify'
             ],
-            'mobile' => [
-                'class' => 'League\OAuth2\Server\Grant\PasswordGrant',
-                'access_token_ttl' => 604800,
-                'callback' => '\App\Http\Controllers\Auth\MobileAuthController@passwordGrantVerify'
-            ],
             'authorization_code' => [
                 'class' => '\League\OAuth2\Server\Grant\AuthCodeGrant',
                 'access_token_ttl' => 3600,

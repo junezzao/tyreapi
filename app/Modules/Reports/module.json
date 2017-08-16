@@ -1,8 +1,0 @@
-{
-	"name": "Reports",
-	"slug": "reports",
-	"namespace": "Reports",
-	"version": "1.0",
-	"description": "Hubwire Arc reporting module",
-	"enabled": true
-}

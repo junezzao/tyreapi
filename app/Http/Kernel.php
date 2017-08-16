@@ -50,15 +50,5 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\VerifyCsrfToken::class,
         ],
 
-        'partner' => [
-            'partner_auth',
-            'throttle:30,10'
-        ],
-
-        'store' => [
-            'oauth',
-            'throttle:600,1'
-        ],
-
     ];
 }

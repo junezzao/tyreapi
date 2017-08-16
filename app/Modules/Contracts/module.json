@@ -1,8 +1,0 @@
-{
-	"name": "Contracts",
-	"slug": "contracts",
-	"namespace": "Contracts",
-	"version": "1.0",
-	"description": "This is the description for the Contracts module.",
-	"enabled": true
-}

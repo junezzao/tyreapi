@@ -163,11 +163,7 @@ return [
         App\Providers\AuthServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-        App\Providers\ChannelServiceProvider::class,
-        App\Providers\PartnerServiceProvider::class,
         App\Providers\OAuthServiceProvider::class,
-        App\Providers\StockTransferServiceProvider::class,
-        App\Providers\SalesServiceProvider::class,
         App\Providers\RepositoryServiceProvider::class,
         App\Providers\HelperServiceProvider::class,
         

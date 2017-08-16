@@ -1,8 +1,0 @@
-{
-	"name": "Third Party",
-	"slug": "thirdparty",
-	"namespace": "ThirdParty",
-	"version": "1.0",
-	"description": "Hubwire Third Party Integration Module",
-	"enabled": true
-}
