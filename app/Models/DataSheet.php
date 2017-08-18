@@ -52,12 +52,17 @@ class DataSheet extends BaseModel
         $settingRow = \DB::table('settings')->where('name', 'Data Health')->first();
         $healthLevels = json_decode($settingRow->value, true);
 
-        foreach($healthLevels as $level) {
-            $min_level = $level['min_level'];
-            $max_level = $level['max_level'];
+        if($this->invalid_pct <= 0) {
+            return $healthLevels[0];
+        }
+        else {
+            foreach($healthLevels as $level) {
+                $min_level = $level['min_level'];
+                $max_level = $level['max_level'];
 
-            if($this->invalid_pct > $level['min_level'] && $this->invalid_pct <= $level['max_level']) {
-                return $level;
+                if($this->invalid_pct > $level['min_level'] && $this->invalid_pct <= $level['max_level']) {
+                    return $level;
+                }
             }
         }
 
