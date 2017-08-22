@@ -43,7 +43,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('reports:generateReports "reports:generateSalesReport" weekly')
                  ->sundays()->at('16:00');
 
-        $schedule->command('calculate:fees HubwireFee')->dailyAt('16:00')->when(function () {
+        $schedule->command('calculate:fees Fee')->dailyAt('16:00')->when(function () {
             return \Carbon\Carbon::now()->endOfMonth()->isToday();
         });
 

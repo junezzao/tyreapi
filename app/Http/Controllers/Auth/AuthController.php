@@ -108,7 +108,7 @@ class AuthController extends Controller
                 $session['access_token'] = $response['access_token'];
                 $session['token_type'] = $response['token_type'];
                 $session['expires_on'] = Carbon::now()->addminutes($response['expires_in']);
-                Session::put('hapi', $session);
+                Session::put('tyreapi', $session);
 
                 $user = User::where('email', strtolower($credentials['email']))->first();
                 $userSession['user_id'] = $user->id;
@@ -138,10 +138,10 @@ class AuthController extends Controller
     public function getLogout() {
         $this->redirectAfterLogout = route('hw.getlogin');
 
-        $access_token = Session::get('hapi');
+        $access_token = Session::get('tyreapi');
         Activity::log('User logout successfully.', \Auth::guard('web')->user('id'));
         // $response = $this->logoutUser($access_token['access_token']);
-        Session::forget('hapi');
+        Session::forget('tyreapi');
         Auth::guard('web')->logout();
         return redirect()->route('hw.login');
     }
@@ -188,7 +188,7 @@ class AuthController extends Controller
         $response = $userRepo->update(array('password' => bcrypt($request->input('password')), 'status' => 'Active'), $request->input('user_id'));
 
         if ($response) {
-            Session::forget('hapi');
+            Session::forget('tyreapi');
 
             $userSession = session('user');
             $userSession['status'] = 'Active';

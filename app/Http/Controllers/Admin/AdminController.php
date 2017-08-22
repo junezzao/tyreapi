@@ -29,41 +29,7 @@ class AdminController extends Controller
         return $randomString;
     }
 
-    public function HWSKU($sku_id){
-        $sku = SKU::with('combinations','product')->findOrFail($sku_id);
-        $option_arr = array();
-        foreach($sku->combinations as $sku_option){
-            $option_arr[strtolower(trim($sku_option->option_name))] = array('value'=>trim(strip_tags($sku_option->option_value)),'id'=>$sku_option->option_id);
-        }
-        $colours = config('colours');
-        $colour_desc = array_keys($colours);
-        // Map 'Colour' option value to the colour code table $colours
-        $colour = in_array( strtolower($option_arr['colour']['value']), $colour_desc)? $colours[strtolower($option_arr['colour']['value'])]:strtoupper(trim(substr($option_arr['colour']['value'],0,3)));
-        // $product = Product::find($sku->product_id);
-        $sku->hubwire_sku = $sku_id.$sku->product->brand.sprintf("%06d", $sku->product_id).'-'.$this->removeNonAlphaNum($colour).'-'.$this->removeNonAlphaNum(strtoupper($option_arr['size']['value']));
-        $sku->save();
-        return $sku->hubwire_sku;
-    }
-
     public function removeNonAlphaNum($str){
         return preg_replace('/\s+/', '', preg_replace('/[^A-Za-z0-9 ]/','_',$str));
     }
-
-    public function ErrorAlert($email_data){
-        // if(env('APP_ENV') != 'production') return;
-
-        $emails = array(
-                    'to' => array('yuki@hubwire.com'), 
-                    'cc' => array(
-                        'mahadhir@hubwire.com',
-                        'jun@hubwire.com'
-                    )
-                );
-
-        $email_data['email'] = $emails;
-
-        $mailer = new Mailer;
-        $mailer->thirdPartySyncError($email_data);
-    }
-
 }

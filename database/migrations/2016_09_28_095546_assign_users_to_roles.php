@@ -14,14 +14,12 @@ class AssignUsersToRoles extends Migration
      */
     public function up()
     {
-        // get all hubwire users
-        $hwUsers = User::where('email', 'like', '%@hubwire.com')->get();
-        $superadmin = ['hehui@hubwire.com', 'rachel@hubwire.com', 'yuki@hubwire.com', 'jun@hubwire.com', 'mark@hubwire.com'];
-        $admin = ['annnee@hubwire.com', 'chris@hubwire.com', 'cyndel@huwbire.com', 'mahadhir@hubwire.com', 
-                  'gary@hubwire.com', 'alex@huwbire.com', 'gary@hubwire.com', 'geraldine@hubwire.com',
-                  'saerah@hubwire.com', 'tianna@hubwire.com'];
-        $finance = ['angie@hubwire.com', 'kim@hubwire.com', 'nanthini@hubwire.com', 'martijn@hubwire.com'];
-        $oe = ['prashan@hubwire.com', 'viknes@hubwire.com', 'jedidiah@hubwire.com', 'jagedes@hubwire.com'];
+        // get all prog group users
+        $hwUsers = User::where('email', 'like', '%@prog.com.my')->get();
+        $superadmin = ['superadmin@prog.com.my'];
+        $admin = ['admin@prog.com.my'];
+        $finance = ['finance@prog.com.my'];
+        $oe = ['oe@prog.com.my'];
 
         //set superadmin
         foreach ($hwUsers as $user) {

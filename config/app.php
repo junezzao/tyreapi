@@ -41,8 +41,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://' . $domainPrefix . 'api.hubwire.com'),
-    //'api_url' => env('APP_API_URL', 'http://' . $domainPrefix . 'api.hubwire.com'),
+    'url' => env('APP_URL'),
 
     /*
     |--------------------------------------------------------------------------

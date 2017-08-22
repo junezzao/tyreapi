@@ -12,9 +12,7 @@ use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Support\Facades\Validator;
 
 /**
- * A service used to upload/delete files from AWS S3 bucket as well as creating record at HAPI
- *
- * @author Chris Chua
+ * A service used to upload/delete files from AWS S3 bucket as well as creating record at API
  */
 class MediaService
 {

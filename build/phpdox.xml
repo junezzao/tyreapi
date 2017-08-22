@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <phpdox xmlns="http://phpdox.de/config">
-    <project name="HAPI" source="src" workdir="build/phpdox">
+    <project name="Pro Tyre Admin" source="src" workdir="build/phpdox">
         <collector publiconly="false">
             <include mask="*.php" />
             <exclude mask="*Autoload.php" />

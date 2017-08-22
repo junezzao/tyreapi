@@ -7,7 +7,7 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase
      *
      * @var string
      */
-    protected $baseUrl = '';// 'http://hapi.local.com/1.0';
+    protected $baseUrl = '';
 
     /**
      * Creates the application.
