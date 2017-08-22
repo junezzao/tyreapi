@@ -184,6 +184,8 @@ class UsersController extends AdminController
         if($subscription->status == 'Active') {
             $user->category = $role->name;
             $user->subscription_id = $subscription->id;
+            $user->detachAllRoles();
+            $user->attachRole($role->id);
             $user->save();
         }
 

@@ -52,10 +52,12 @@ class UpdateUserSubscriptionPlan extends Command
         foreach($subscriptions as $subs) {
             $role = Role::findOrFail($subs->role_id);
 
-            User::where('id', $subs->user_id)->update([
-                'category' => $role->name,
-                'subscription_id' => $subs->id
-            ]);
+            $user = User::find($subs->user_id);
+            $user->category = $role->name;
+            $user->subscription_id = $subs->id;
+            $user->detachAllRoles();
+            $user->attachRole($role->id);
+            $user->save();
 
             $subs->status = 'Active';
             $subs->save();

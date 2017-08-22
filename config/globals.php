@@ -1,14 +1,9 @@
 <?php
 return [
     'status_code' => [
-        'NOT_AVAILABLE_ERROR' => 501,
-        'SERVER_ERROR'        => 500, // Unexpected Exception encountered / try catch error
-        'VALIDATION_ERROR'    => 412, // Validation
-        'STANDARD_ERROR'      => 300,
-        'DATA_ERROR'          => 404,
-        'OK_STATUS'           => 200,
-        'UNKNOWN'             => 999,
-        'OAUTH_ERROR'         => 400,
+        '500'        => 'Internal Server Error',
+        '404'        => 'Page Not Found',
+        '403'        => 'Unauthorized Action'
     ],
 
     'date_format'           => 'd-m-Y',
