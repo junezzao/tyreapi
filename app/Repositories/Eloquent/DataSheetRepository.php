@@ -5,6 +5,7 @@ namespace App\Repositories\Eloquent;
 use App\Repositories\Contracts\DataSheetRepositoryContract as DataSheetRepositoryInterface;
 use App\Repositories\Repository as Repository;
 use App\Models\DataSheet;
+use App\Models\Data;
 use App\Exceptions\ValidationException as ValidationException;
 use LucaDegasperi\OAuth2Server\Facades\Authorizer;
 use Activity;
@@ -112,9 +113,32 @@ class DataSheetRepository extends Repository implements DataSheetRepositoryInter
         return $sheet;
     }
 
-    public function getDataByUser($userId) {
+    public function getDataByUser($filter, $userId) {
         $sheet = $this->model->where('user_id', $userId)->first();
-        return !empty($sheet) ? $sheet->data : array();
+
+        $data = array();
+        if(empty($sheet)) return $data;
+
+        $data = Data::where('sheet_id', $sheet->id);
+
+        foreach($filter['columns'] as $index=>$column) {
+            if($column['searchable'] == true) {
+                if(!empty($column['search']['value'])) {
+                    $data = $data->where(strtolower($column['data']), 'like', '%'.strtolower($column['search']['value']).'%');
+                }
+            }
+        }
+        
+        $total = $data->count();
+
+        $data = $data->skip($filter['start'])
+                    ->take($filter['length']);
+
+        foreach($filter['order'] as $index=>$order) {
+            $data = $data->orderBy($filter['columns'][$order['column']]['data'], $order['dir']);
+        }
+
+        return ['total'=>$total, 'data'=>$data->get()->toArray()];
     }
 
     public function viewTruckPosition($userId) {

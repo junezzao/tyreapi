@@ -31,10 +31,10 @@ class DataController extends Controller
 		return response()->json($sheet);
 	}
 
-	public function getData($userId)
+	public function getData(Request $request, $userId)
 	{
-		$data = $this->dataSheetRepo->getDataByUser($userId);
-		// \Log::info(print_r($sheet, true));
+		$data = $this->dataSheetRepo->getDataByUser($request->all(), $userId);
+		//\Log::info('data... '.print_r($data, true));
 		return response()->json($data);
 	}
 
