@@ -43,9 +43,9 @@ class ReportController extends Controller
 		return response()->json($sheet);
 	}
 
-	public function tyreRemovalRecord($userId)
+	public function tyreRemovalRecord($userId, $type)
 	{
-		$sheet = $this->dataSheetRepo->tyreRemovalRecord($userId);
+		$sheet = $this->dataSheetRepo->tyreRemovalRecord($userId, $type);
 		// \Log::info(print_r($sheet, true));
 		return response()->json($sheet);
 	}

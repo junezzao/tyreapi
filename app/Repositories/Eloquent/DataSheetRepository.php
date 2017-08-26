@@ -574,7 +574,7 @@ class DataSheetRepository extends Repository implements DataSheetRepositoryInter
         return [];
     }
 
-    public function tyreRemovalRecord($userId) {
+    public function tyreRemovalRecord($userId, $type) {
         $sheet = $this->model->where('user_id', $userId)->first();
 
         $return = array();
@@ -584,165 +584,177 @@ class DataSheetRepository extends Repository implements DataSheetRepositoryInter
 
         if(!empty($sheet)) {
 
-            // part 1
-            $jobsheets = \DB::select('
-                            select * from data
-                            where sheet_id = '.$sheet->id.'
-                            and
-                            (
-                                out_reason is null and out_reason = ""
-                                and out_size is null and out_size = ""
-                                and out_brand is null and out_brand = ""
-                                and out_pattern is null and out_pattern = ""
-                                and out_retread_brand is null and out_retread_brand = ""
-                                and out_retread_pattern is null and out_retread_pattern = ""
-                                and out_serial_no is null and out_serial_no = ""
-                                and out_job_card_no is null and out_job_card_no = ""
-                                and out_rtd is null and out_rtd = ""
-                            )
-                            and 
-                            (
-                                (in_attr is not null and in_attr != "")
-                                or (in_price is not null and in_price != "")
-                                or (in_size is not null and in_size != "")
-                                or (in_brand is not null and in_brand != "")
-                                or (in_pattern is not null and in_pattern != "")
-                                or (in_retread_brand is not null and in_retread_brand != "")
-                                or (in_retread_pattern is not null and in_retread_pattern != "")
-                                or (in_serial_no is not null and in_serial_no != "")
-                                or (in_job_card_no is not null and in_job_card_no != "")
-                            )
-                            order by line_number asc
-                        ');
+            if($type == 'only_in') {
+                // part 1
+                $jobsheets = \DB::select('
+                                select * from data
+                                where sheet_id = '.$sheet->id.'
+                                and
+                                (
+                                    (out_reason is null or out_reason = "")
+                                    and (out_size is null or out_size = "")
+                                    and (out_brand is null or out_brand = "")
+                                    and (out_pattern is null or out_pattern = "")
+                                    and (out_retread_brand is null or out_retread_brand = "")
+                                    and (out_retread_pattern is null or out_retread_pattern = "")
+                                    and (out_serial_no is null or out_serial_no = "")
+                                    and (out_job_card_no is null or out_job_card_no = "")
+                                    and (out_rtd is null or out_rtd = "")
+                                )
+                                and 
+                                (
+                                    (in_attr is not null and in_attr != "")
+                                    or (in_price is not null and in_price != "")
+                                    or (in_size is not null and in_size != "")
+                                    or (in_brand is not null and in_brand != "")
+                                    or (in_pattern is not null and in_pattern != "")
+                                    or (in_retread_brand is not null and in_retread_brand != "")
+                                    or (in_retread_pattern is not null and in_retread_pattern != "")
+                                    or (in_serial_no is not null and in_serial_no != "")
+                                    or (in_job_card_no is not null and in_job_card_no != "")
+                                )
+                                order by line_number asc
+                            ');
 
-            foreach($jobsheets as $jobsheet) {
-                $vehicle = $this->getVehicleInfo($jobsheet);
+                foreach($jobsheets as $jobsheet) {
+                    $vehicle = $this->getVehicleInfo($jobsheet);
 
-                $return['only_in'][] = array(
-                    'line'      => $jobsheet->line_number,
-                    'jobsheet'  => $jobsheet->jobsheet_no,
-                    'type'      => $jobsheet->jobsheet_type,
-                    'customer'  => $jobsheet->customer_name,
-                    'vehicle'   => $vehicle,
-                    'position'  => $jobsheet->position,
-                    'remark'    => 'Only Tyre In'
-                );
-            }
-            // part 1 end
-
-            // part 2
-            $jobsheets = \DB::select('
-                            select * from data
-                            where sheet_id = '.$sheet->id.'
-                            and
-                            (
-                                in_attr is null and in_attr = ""
-                                and in_price is null and in_price = ""
-                                and in_size is null and in_size = ""
-                                and in_pattern is null and in_pattern = ""
-                                and in_retread_brand is null and in_retread_brand = ""
-                                and in_retread_pattern is null and in_retread_pattern = ""
-                                and in_serial_no is null and in_serial_no = ""
-                                and in_job_card_no is null and in_job_card_no = ""
-                            )
-                            and 
-                            (
-                                (out_reason is not null and out_reason != "")
-                                or (out_size is not null and out_size != "")
-                                or (out_brand is not null and out_brand != "")
-                                or (out_pattern is not null and out_pattern != "")
-                                or (out_retread_brand is not null and out_retread_brand != "")
-                                or (out_retread_pattern is not null and out_retread_pattern != "")
-                                or (out_serial_no is not null and out_serial_no != "")
-                                or (out_job_card_no is not null and out_job_card_no != "")
-                                or (out_rtd is not null and out_rtd != "")
-                            )
-                            order by line_number asc
-                        ');
-
-            foreach($jobsheets as $jobsheet) {
-                $vehicle = $this->getVehicleInfo($jobsheet);
-
-                $return['only_out'][] = array(
-                    'line'      => $jobsheet->line_number,
-                    'jobsheet'  => $jobsheet->jobsheet_no,
-                    'type'      => $jobsheet->jobsheet_type,
-                    'customer'  => $jobsheet->customer_name,
-                    'vehicle'   => $vehicle,
-                    'position'  => $jobsheet->position,
-                    'remark'    => 'Only Tyre Out'
-                );
-            }
-            // part 2 end
-
-            // part 3
-            $jobsheets = \DB::select('
-                            select * from data
-                            where sheet_id = '.$sheet->id.'
-                            and jobsheet_date is not null
-                            and position is not null and position != ""
-                            order by jobsheet_date asc
-                        ');
-            
-            $vehicles = array();
-            foreach($jobsheets as $jobsheet) {
-                $vehicle = $this->getVehicleInfo($jobsheet);
-
-                if(!empty($vehicle)) {
-                    if(!empty($jobsheet->out_serial_no) && isset($vehicles[$vehicle])) {
-                        $tyre = $this->getTyreInfo($jobsheet, 'out', true);
-
-                        $vehicles[$vehicle][$jobsheet->position][] = array(
-                            'type'      => 'out',
-                            'serialNo'  => $jobsheet->out_serial_no,
-                            'info'      => 'Date '.Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date)).' @'.Helper::formatEmpty($jobsheet->jobsheet_no).' Pos '.Helper::formatEmpty($jobsheet->position).', Remove: '.Helper::formatEmpty($tyre).', '.Helper::formatEmpty($jobsheet->out_serial_no)
-                        );
-                    }
-
-                    if(!empty($jobsheet->in_serial_no)) {
-                        $tyre = $this->getTyreInfo($jobsheet, 'in', true);
-
-                        $vehicles[$vehicle][$jobsheet->position][] = array(
-                            'type'      => 'in',
-                            'serialNo'  => $jobsheet->in_serial_no,
-                            'info'      => 'Date '.Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date)).' @'.Helper::formatEmpty($jobsheet->jobsheet_no).' Pos '.Helper::formatEmpty($jobsheet->position).', Fitting: '.Helper::formatEmpty($tyre).', '.Helper::formatEmpty($jobsheet->in_serial_no)
-                        );
-                    }
+                    $return['only_in'][] = array(
+                        'line'      => $jobsheet->line_number,
+                        'jobsheet'  => $jobsheet->jobsheet_no,
+                        'type'      => $jobsheet->jobsheet_type,
+                        'customer'  => $jobsheet->customer_name,
+                        'vehicle'   => $vehicle,
+                        'position'  => $jobsheet->position,
+                        'remark'    => 'Only Tyre In'
+                    );
                 }
+                // part 1 end
+
+                return $return['only_in'];
             }
 
-            foreach($vehicles as $vehicle => $positions) {
-                foreach($positions as $position => $fittings) {
-                    if(count($fittings) <= 1) continue;
+            if($type == 'only_out') {
+                // part 2
+                $jobsheets = \DB::select('
+                                select * from data
+                                where sheet_id = '.$sheet->id.'
+                                and
+                                (
+                                    (in_attr is null or in_attr = "")
+                                    and (in_price is null or in_price = "")
+                                    and (in_size is null or in_size = "")
+                                    and (in_pattern is null or in_pattern = "")
+                                    and (in_retread_brand is null or in_retread_brand = "")
+                                    and (in_retread_pattern is null or in_retread_pattern = "")
+                                    and (in_serial_no is null or in_serial_no = "")
+                                    and (in_job_card_no is null or in_job_card_no = "")
+                                )
+                                and 
+                                (
+                                    (out_reason is not null and out_reason != "")
+                                    or (out_size is not null and out_size != "")
+                                    or (out_brand is not null and out_brand != "")
+                                    or (out_pattern is not null and out_pattern != "")
+                                    or (out_retread_brand is not null and out_retread_brand != "")
+                                    or (out_retread_pattern is not null and out_retread_pattern != "")
+                                    or (out_serial_no is not null and out_serial_no != "")
+                                    or (out_job_card_no is not null and out_job_card_no != "")
+                                    or (out_rtd is not null and out_rtd != "")
+                                )
+                                order by line_number asc
+                            ');
 
-                    foreach($fittings as $index => $fitting) {
-                        if($index > 0) {
-                            if($fitting['type'] == 'out' && $lastFittingType == 'in' && $fitting['serialNo'] != $lastSerialNo) {
-                                $return['conflict'][$vehicle][$index-1] = [
-                                    'info'      => $fittings[$index-1]['info'],
-                                    'remark'    => 'Serial No. Mismatch'
-                                ]; 
-                                $return['conflict'][$vehicle][$index] = [
-                                    'info'      => $fittings[$index]['info'],
-                                    'remark'    => 'Serial No. Mismatch'
-                                ];
-                            }
+                foreach($jobsheets as $jobsheet) {
+                    $vehicle = $this->getVehicleInfo($jobsheet);
+
+                    $return['only_out'][] = array(
+                        'line'      => $jobsheet->line_number,
+                        'jobsheet'  => $jobsheet->jobsheet_no,
+                        'type'      => $jobsheet->jobsheet_type,
+                        'customer'  => $jobsheet->customer_name,
+                        'vehicle'   => $vehicle,
+                        'position'  => $jobsheet->position,
+                        'remark'    => 'Only Tyre Out'
+                    );
+                }
+                // part 2 end
+
+                return $return['only_out'];
+            }
+
+            if($type == 'conflict') {
+                // part 3
+                $jobsheets = \DB::select('
+                                select * from data
+                                where sheet_id = '.$sheet->id.'
+                                and jobsheet_date is not null
+                                and position is not null and position != ""
+                                order by jobsheet_date asc
+                            ');
+                
+                $vehicles = array();
+                foreach($jobsheets as $jobsheet) {
+                    $vehicle = $this->getVehicleInfo($jobsheet);
+
+                    if(!empty($vehicle)) {
+                        if(!empty($jobsheet->out_serial_no) && isset($vehicles[$vehicle])) {
+                            $tyre = $this->getTyreInfo($jobsheet, 'out', true);
+
+                            $vehicles[$vehicle][$jobsheet->position][] = array(
+                                'type'      => 'out',
+                                'serialNo'  => $jobsheet->out_serial_no,
+                                'info'      => 'Date '.Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date)).' @'.Helper::formatEmpty($jobsheet->jobsheet_no).' Pos '.Helper::formatEmpty($jobsheet->position).', Remove: '.Helper::formatEmpty($tyre).', '.Helper::formatEmpty($jobsheet->out_serial_no)
+                            );
                         }
 
-                        $lastFittingType    = $fitting['type'];
-                        $lastSerialNo       = $fitting['serialNo'];
-                    }
+                        if(!empty($jobsheet->in_serial_no)) {
+                            $tyre = $this->getTyreInfo($jobsheet, 'in', true);
 
-                    if(isset($return['conflict'][$vehicle])) {
-                        $return['conflict'][$vehicle] = array_values($return['conflict'][$vehicle]);
+                            $vehicles[$vehicle][$jobsheet->position][] = array(
+                                'type'      => 'in',
+                                'serialNo'  => $jobsheet->in_serial_no,
+                                'info'      => 'Date '.Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date)).' @'.Helper::formatEmpty($jobsheet->jobsheet_no).' Pos '.Helper::formatEmpty($jobsheet->position).', Fitting: '.Helper::formatEmpty($tyre).', '.Helper::formatEmpty($jobsheet->in_serial_no)
+                            );
+                        }
                     }
                 }
+
+                foreach($vehicles as $vehicle => $positions) {
+                    foreach($positions as $position => $fittings) {
+                        if(count($fittings) <= 1) continue;
+
+                        foreach($fittings as $index => $fitting) {
+                            if($index > 0) {
+                                if($fitting['type'] == 'out' && $lastFittingType == 'in' && $fitting['serialNo'] != $lastSerialNo) {
+                                    $return['conflict'][$vehicle][$index-1] = [
+                                        'info'      => $fittings[$index-1]['info'],
+                                        'remark'    => 'Serial No. Mismatch'
+                                    ]; 
+                                    $return['conflict'][$vehicle][$index] = [
+                                        'info'      => $fittings[$index]['info'],
+                                        'remark'    => 'Serial No. Mismatch'
+                                    ];
+                                }
+                            }
+
+                            $lastFittingType    = $fitting['type'];
+                            $lastSerialNo       = $fitting['serialNo'];
+                        }
+
+                        if(isset($return['conflict'][$vehicle])) {
+                            $return['conflict'][$vehicle] = array_values($return['conflict'][$vehicle]);
+                        }
+                    }
+                }
+                // part 3 end
+
+                return $return['conflict'];
             }
-            // part 3 end
         }
 
         // \Log::info('return... '.print_r($return['conflict'], true));
-        return $return;
+        return [];
     }
 
     public function tyreRemovalMileage($userId) {

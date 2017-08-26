@@ -49,7 +49,7 @@ Route::group(['prefix' => '1.0'], function(){
 			Route::get('/{user_id}/serial_no_analysis/{type}', 'ReportController@serialNoAnalysis');
 			Route::get('/{user_id}/odometer_analysis/{type}', 'ReportController@odometerAnalysis');
 			Route::get('/{user_id}/tyre_removal_mileage', 'ReportController@tyreRemovalMileage');
-			Route::get('/{user_id}/tyre_removal_record', 'ReportController@tyreRemovalRecord');
+			Route::get('/{user_id}/tyre_removal_record/{type}', 'ReportController@tyreRemovalRecord');
 			Route::get('/{user_id}/truck_tyre_cost', 'ReportController@truckTyreCost');
 			Route::get('/{user_id}/truck_service_record', 'ReportController@truckServiceRecord');
 		});
