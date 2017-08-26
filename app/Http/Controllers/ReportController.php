@@ -29,9 +29,9 @@ class ReportController extends Controller
 		return response()->json($sheet);
 	}
 
-	public function odometerAnalysis(Request $request, $userId)
+	public function odometerAnalysis(Request $request, $userId, $type)
 	{
-		$sheet = $this->dataSheetRepo->odometerAnalysis($userId, $request->check_trailer);
+		$sheet = $this->dataSheetRepo->odometerAnalysis($userId, $request->check_trailer, $type);
 		// \Log::info(print_r($request->all(), true));
 		return response()->json($sheet);
 	}

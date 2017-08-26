@@ -493,7 +493,7 @@ class DataSheetRepository extends Repository implements DataSheetRepositoryInter
         return [];
     }
 
-    public function odometerAnalysis($userId, $checkTrailer) {
+    public function odometerAnalysis($userId, $checkTrailer, $type) {
         $sheet = $this->model->where('user_id', $userId)->first();
 
         $return = array();
@@ -502,69 +502,76 @@ class DataSheetRepository extends Repository implements DataSheetRepositoryInter
 
         if(!empty($sheet)) {
 
-            // part 1
-            $jobsheets = \DB::select('
-                            select * from data
-                            where sheet_id = '.$sheet->id.'
-                            and (odometer is null or odometer = "")'.
-                            ($checkTrailer == 'N' ? ' and (trailer_no is null or trailer_no = "")' : '')
-                        );
-            foreach($jobsheets as $jobsheet) {
-                $vehicle = $this->getVehicleInfo($jobsheet);
+            if($type == 'missing') {
+                // part 1
+                $jobsheets = \DB::select('
+                                select * from data
+                                where sheet_id = '.$sheet->id.'
+                                and (odometer is null or odometer = "")'.
+                                ($checkTrailer == 'N' ? ' and (trailer_no is null or trailer_no = "")' : '')
+                            );
+                foreach($jobsheets as $jobsheet) {
+                    $vehicle = $this->getVehicleInfo($jobsheet);
 
-                $return['missing'][] = [
-                    'line'      => $jobsheet->line_number,
-                    'date'      => $jobsheet->jobsheet_date,
-                    'jobsheet'  => $jobsheet->jobsheet_no,
-                    'vehicle'   => $vehicle,
-                    'remark'    => 'No Odometer'
-                ];
-            }
-            // part 1 end
-
-            // part 2
-            $jobsheets = \DB::select('
-                            select * from data
-                            where sheet_id = '.$sheet->id.'
-                            and jobsheet_date is not null 
-                            and odometer is not null and odometer != ""
-                            order by jobsheet_date asc
-                        ');
-            $vehicles = array();
-            foreach($jobsheets as $jobsheet) {
-                $vehicle = $this->getVehicleInfo($jobsheet);
-
-                if(!empty($vehicle)) {
-                    $vehicles[$vehicle][] = array(
-                        'odometer'  => $jobsheet->odometer,
-                        'info'      => 'Date '.Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date)).' @'.Helper::formatEmpty($jobsheet->jobsheet_no).' Reading: '.Helper::formatEmpty($jobsheet->odometer)
-                    );
+                    $return['missing'][] = [
+                        'line'      => $jobsheet->line_number,
+                        'date'      => $jobsheet->jobsheet_date,
+                        'jobsheet'  => $jobsheet->jobsheet_no,
+                        'vehicle'   => $vehicle,
+                        'remark'    => 'No Odometer'
+                    ];
                 }
+                // part 1 end
+
+                return $return['missing'];
             }
+            elseif($type == 'less') {
+                // part 2
+                $jobsheets = \DB::select('
+                                select * from data
+                                where sheet_id = '.$sheet->id.'
+                                and jobsheet_date is not null 
+                                and odometer is not null and odometer != ""
+                                order by jobsheet_date asc
+                            ');
+                $vehicles = array();
+                foreach($jobsheets as $jobsheet) {
+                    $vehicle = $this->getVehicleInfo($jobsheet);
 
-            foreach($vehicles as $vehicle => $readings) {
-                if(count($readings) <= 1) continue;
+                    if(!empty($vehicle)) {
+                        $vehicles[$vehicle][] = array(
+                            'odometer'  => $jobsheet->odometer,
+                            'info'      => 'Date '.Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date)).' @'.Helper::formatEmpty($jobsheet->jobsheet_no).' Reading: '.Helper::formatEmpty($jobsheet->odometer)
+                        );
+                    }
+                }
 
-                foreach($readings as $index => $reading) {
-                    if($index > 0) {
-                        if($reading['odometer'] < $lastReading) {
-                            $return['less'][$vehicle][$index-1] = $readings[$index-1]['info']; 
-                            $return['less'][$vehicle][$index]   = $readings[$index]['info']; 
+                foreach($vehicles as $vehicle => $readings) {
+                    if(count($readings) <= 1) continue;
+
+                    foreach($readings as $index => $reading) {
+                        if($index > 0) {
+                            if($reading['odometer'] < $lastReading) {
+                                $return['less'][$vehicle][$index-1] = $readings[$index-1]['info']; 
+                                $return['less'][$vehicle][$index]   = $readings[$index]['info']; 
+                            }
                         }
+
+                        $lastReading = $reading['odometer'];
                     }
 
-                    $lastReading = $reading['odometer'];
+                    if(isset($return['less'][$vehicle])) {
+                        $return['less'][$vehicle] = array_values($return['less'][$vehicle]);
+                    }
                 }
+                // part 2 end
 
-                if(isset($return['less'][$vehicle])) {
-                    $return['less'][$vehicle] = array_values($return['less'][$vehicle]);
-                }
+                return $return['less'];
             }
-            // part 2 end
         }
 
         // \Log::info('return... '.print_r($return, true));
-        return $return;
+        return [];
     }
 
     public function tyreRemovalRecord($userId) {
