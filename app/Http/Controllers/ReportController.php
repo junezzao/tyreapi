@@ -22,9 +22,9 @@ class ReportController extends Controller
         $this->dataSheetRepo = $dataSheetRepo;
     }
 
-    public function serialNoAnalysis($userId)
+    public function serialNoAnalysis($userId, $type)
 	{
-		$sheet = $this->dataSheetRepo->serialNoAnalysis($userId);
+		$sheet = $this->dataSheetRepo->serialNoAnalysis($userId, $type);
 		// \Log::info(print_r($sheet, true));
 		return response()->json($sheet);
 	}

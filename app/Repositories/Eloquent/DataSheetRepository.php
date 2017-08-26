@@ -377,7 +377,7 @@ class DataSheetRepository extends Repository implements DataSheetRepositoryInter
         return array_sort_recursive($return);
     }
 
-    public function serialNoAnalysis($userId) {
+    public function serialNoAnalysis($userId, $type) {
         $sheet = $this->model->where('user_id', $userId)->first();
 
         $return = array();
@@ -386,103 +386,111 @@ class DataSheetRepository extends Repository implements DataSheetRepositoryInter
 
         if(!empty($sheet)) {
 
-            // part 1
-            $jobsheets = \DB::select('
-                            select * from data
-                            where sheet_id = '.$sheet->id.'
-                            and in_serial_no is null or in_serial_no = ""
-                            or out_serial_no is null or out_serial_no = ""
-                        ');
-            foreach($jobsheets as $jobsheet) {
-                $vehicle = $this->getVehicleInfo($jobsheet);
-                
-                if(empty($jobsheet->in_serial_no)) {
-                    $tyre = $this->getTyreInfo($jobsheet, 'in', false, true);
+            if($type == 'missing') {
+                // part 1
+                $jobsheets = \DB::select('
+                                select * from data
+                                where sheet_id = '.$sheet->id.'
+                                and in_serial_no is null or in_serial_no = ""
+                                or out_serial_no is null or out_serial_no = ""
+                            ');
+                foreach($jobsheets as $jobsheet) {
+                    $vehicle = $this->getVehicleInfo($jobsheet);
+                    
+                    if(empty($jobsheet->in_serial_no)) {
+                        $tyre = $this->getTyreInfo($jobsheet, 'in', false, true);
 
-                    $return['missing'][] = [
-                        'line'      => $jobsheet->line_number,
-                        'jobsheet'  => $jobsheet->jobsheet_no,
-                        'type'      => $jobsheet->jobsheet_type,
-                        'customer'  => $jobsheet->customer_name,
-                        'vehicle'   => $vehicle,
-                        'position'  => $jobsheet->position,
-                        'in_out'    => 'In',
-                        'tyre'      => $tyre,
-                        'remark'    => 'No Serial No.'
-                    ];
-                }
-
-                if(empty($jobsheet->out_serial_no)) {
-                    $tyre = $this->getTyreInfo($jobsheet, 'out', false, true);
-
-                    $return['missing'][] = [
-                        'line'      => $jobsheet->line_number,
-                        'jobsheet'  => $jobsheet->jobsheet_no,
-                        'type'      => $jobsheet->jobsheet_type,
-                        'customer'  => $jobsheet->customer_name,
-                        'vehicle'   => $vehicle,
-                        'position'  => $jobsheet->position,
-                        'in_out'    => 'Out',
-                        'tyre'      => $tyre,
-                        'remark'    => 'No Serial No.'
-                    ];
-                }
-            }
-            // part 1 end
-
-            // part 2
-            $jobsheets = \DB::select('
-                            select * from data
-                            where sheet_id = '.$sheet->id.'
-                            and jobsheet_date is not null and
-                            (
-                                (in_serial_no is not null and in_serial_no != "")
-                                or 
-                                (out_serial_no is not null and out_serial_no != "")
-                            )
-                            order by jobsheet_date asc
-                        ');
-            $serialNos = array();
-            foreach($jobsheets as $jobsheet) {
-                $vehicle = $this->getVehicleInfo($jobsheet);
-
-                if(!empty($jobsheet->in_serial_no)) {
-                    $serialNos[$jobsheet->in_serial_no][] = array(
-                        'type' => 'in',
-                        'info' => 'Fitting date '.Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date)).' @'.Helper::formatEmpty($jobsheet->jobsheet_no).' '.Helper::formatEmpty($vehicle).' Pos '.Helper::formatEmpty($jobsheet->position)
-                    );
-                }
-
-                if(!empty($jobsheet->out_serial_no) && isset($serialNos[$jobsheet->out_serial_no])) { // to make sure the first record of each serial no is always IN record
-                    $serialNos[$jobsheet->out_serial_no][] = array(
-                        'type' => 'out'
-                    );
-                }
-            }
-
-            foreach($serialNos as $serialNo => $fittings) {
-                if(count($fittings) <= 1) continue;
-
-                foreach($fittings as $index => $fitting) {
-                    if($index > 0) {
-                        if($fitting['type'] == $lastFittingType && $fitting['type'] == 'in') {
-                            $return['repeated'][$serialNo][$index-1]    = $fittings[$index-1]['info']; 
-                            $return['repeated'][$serialNo][$index]      = $fittings[$index]['info']; 
-                        }
+                        $return['missing'][] = [
+                            'line'      => $jobsheet->line_number,
+                            'jobsheet'  => $jobsheet->jobsheet_no,
+                            'type'      => $jobsheet->jobsheet_type,
+                            'customer'  => $jobsheet->customer_name,
+                            'vehicle'   => $vehicle,
+                            'position'  => $jobsheet->position,
+                            'in_out'    => 'In',
+                            'tyre'      => $tyre,
+                            'remark'    => 'No Serial No.'
+                        ];
                     }
 
-                    $lastFittingType = $fitting['type'];
+                    if(empty($jobsheet->out_serial_no)) {
+                        $tyre = $this->getTyreInfo($jobsheet, 'out', false, true);
+
+                        $return['missing'][] = [
+                            'line'      => $jobsheet->line_number,
+                            'jobsheet'  => $jobsheet->jobsheet_no,
+                            'type'      => $jobsheet->jobsheet_type,
+                            'customer'  => $jobsheet->customer_name,
+                            'vehicle'   => $vehicle,
+                            'position'  => $jobsheet->position,
+                            'in_out'    => 'Out',
+                            'tyre'      => $tyre,
+                            'remark'    => 'No Serial No.'
+                        ];
+                    }
+                }
+                // part 1 end
+
+                return $return['missing'];
+            }
+
+            elseif($type == 'repeated') {
+                // part 2
+                $jobsheets = \DB::select('
+                                select * from data
+                                where sheet_id = '.$sheet->id.'
+                                and jobsheet_date is not null and
+                                (
+                                    (in_serial_no is not null and in_serial_no != "")
+                                    or 
+                                    (out_serial_no is not null and out_serial_no != "")
+                                )
+                                order by jobsheet_date asc
+                            ');
+                $serialNos = array();
+                foreach($jobsheets as $jobsheet) {
+                    $vehicle = $this->getVehicleInfo($jobsheet);
+
+                    if(!empty($jobsheet->in_serial_no)) {
+                        $serialNos[$jobsheet->in_serial_no][] = array(
+                            'type' => 'in',
+                            'info' => 'Fitting date '.Helper::formatEmpty(Helper::formatDate($jobsheet->jobsheet_date)).' @'.Helper::formatEmpty($jobsheet->jobsheet_no).' '.Helper::formatEmpty($vehicle).' Pos '.Helper::formatEmpty($jobsheet->position)
+                        );
+                    }
+
+                    if(!empty($jobsheet->out_serial_no) && isset($serialNos[$jobsheet->out_serial_no])) { // to make sure the first record of each serial no is always IN record
+                        $serialNos[$jobsheet->out_serial_no][] = array(
+                            'type' => 'out'
+                        );
+                    }
                 }
 
-                if(isset($return['repeated'][$serialNo])) {
-                    $return['repeated'][$serialNo] = array_values($return['repeated'][$serialNo]);
+                foreach($serialNos as $serialNo => $fittings) {
+                    if(count($fittings) <= 1) continue;
+
+                    foreach($fittings as $index => $fitting) {
+                        if($index > 0) {
+                            if($fitting['type'] == $lastFittingType && $fitting['type'] == 'in') {
+                                $return['repeated'][$serialNo][$index-1]    = $fittings[$index-1]['info']; 
+                                $return['repeated'][$serialNo][$index]      = $fittings[$index]['info']; 
+                            }
+                        }
+
+                        $lastFittingType = $fitting['type'];
+                    }
+
+                    if(isset($return['repeated'][$serialNo])) {
+                        $return['repeated'][$serialNo] = array_values($return['repeated'][$serialNo]);
+                    }
                 }
+                // part 2 end
+
+                return $return['repeated'];
             }
-            // part 2 end
         }
 
         //\Log::info('return... '.print_r($return, true));
-        return $return;
+        return [];
     }
 
     public function odometerAnalysis($userId, $checkTrailer) {
