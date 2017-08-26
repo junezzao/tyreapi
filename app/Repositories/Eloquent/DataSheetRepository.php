@@ -767,9 +767,11 @@ class DataSheetRepository extends Repository implements DataSheetRepositoryInter
                             select * from data
                             where sheet_id = '.$sheet->id.'
                             and
-                            (in_serial_no is not null and in_serial_no != "")
-                            or 
-                            (out_serial_no is not null and out_serial_no != "")
+                            (
+                                (in_serial_no is not null and in_serial_no != "")
+                                or 
+                                (out_serial_no is not null and out_serial_no != "")
+                            )
                             order by jobsheet_date asc
                         ');
 
@@ -830,7 +832,6 @@ class DataSheetRepository extends Repository implements DataSheetRepositoryInter
             }
         }
 
-        // \Log::info('return... '.print_r($return, true));
         return $return;
     }
 
@@ -904,7 +905,7 @@ class DataSheetRepository extends Repository implements DataSheetRepositoryInter
 
     public function truckTyreCost($userId, $sort, $limit) {
         $sheet = $this->model->where('user_id', $userId)->first();
-
+        
         $return = array();
 
         if(!empty($sheet)) {
@@ -912,12 +913,12 @@ class DataSheetRepository extends Repository implements DataSheetRepositoryInter
             $rows = \DB::select('
                         select 
                             customer_name, min(jobsheet_date) as from_date, max(jobsheet_date) as to_date
-                        from tyreadmin.data
+                        from data
                         where sheet_id = '.$sheet->id.'
                         and customer_name is not null and customer_name != ""
                         and in_price is not null
                         group by customer_name
-                        order by customer_name asc;
+                        order by customer_name asc
                     ');
 
             foreach($rows as $row) {
@@ -947,6 +948,7 @@ class DataSheetRepository extends Repository implements DataSheetRepositoryInter
 
             foreach($rows as $row) {
                 if(isset($return[$row->customer_name]['costs']['pm']) && count($return[$row->customer_name]['costs']['pm']) < $limit) {
+                    
                     $return[$row->customer_name]['costs']['pm'][] = array(
                         'vehicleNo' => $row->pm_no,
                         'cost' => 'RM'.number_format($row->total_cost, 2)
@@ -1002,7 +1004,7 @@ class DataSheetRepository extends Repository implements DataSheetRepositoryInter
             // part 3 end
         }
 
-        // \Log::info('return... '.print_r($return, true));
+        //\Log::info('return... '.print_r($return, true));
         //die();
         return $return;
     }
