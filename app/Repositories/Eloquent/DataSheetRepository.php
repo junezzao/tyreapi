@@ -117,7 +117,7 @@ class DataSheetRepository extends Repository implements DataSheetRepositoryInter
         $sheet = $this->model->where('user_id', $userId)->first();
 
         $data = array();
-        if(empty($sheet)) return $data;
+        if(empty($sheet)) return ['total' => 0, 'data' => $data];
 
         $data = Data::where('sheet_id', $sheet->id);
 
